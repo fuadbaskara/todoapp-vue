@@ -8,9 +8,9 @@
     <div v-if="todoList.length !== 0" class="inner-container">
       <div class="todo-card" v-for="(todo, index) in todoList" :key="index">
         <div v-if="!todo.updateState" class="todo-desc pointer" :class="{ completed : todo.completed }"
-          v-on:click="completeStatus(todo)" v-on:dblclick="editTodo(todo)">{{ todo.todo }}</div>
-        <input v-else-if="!todo.completed" type="text" class="edit-todo" v-focus v-model="todo.todo"
-          v-on:keyup.enter="updateTodo(todo.id, todo)" v-on:keyup.esc="cancelEdit(todo)"
+          v-on:click="completeStatus(todo.id, todo)" v-on:dblclick="editTodo(todo)">{{ todo.todo }}</div>
+        <input v-else-if="todo.completed === false" type="text" class="edit-todo" v-focus
+          v-model="todo.todo" v-on:keyup.enter="updateTodo(todo.id, todo)" v-on:keyup.esc="cancelEdit(todo)"
           v-on:blur="updateTodo(todo.id, todo)" />
         <div>
           <div class="delete-button pointer" v-on:click="deleteTodo(index, todo.id)" :key="index">
@@ -58,13 +58,14 @@ export default {
     axios
       .get("http://localhost:3000/todoList")
       .then(response => {
+        console.log(response.data);
         let data = [];
         for (var i = 0; i < response.data.length; i++) {
           data.push({
             id: response.data[i].id,
             todo: response.data[i].todo,
-            updateState: false,
-            completed: false
+            completed: response.data[i].completed,
+            updateState: false
           });
         }
         this.todoList = data;
@@ -93,11 +94,14 @@ export default {
         let newId = this.generateId();
         this.todoList.push({
           id: newId,
-          todo: this.todo
+          todo: this.todo,
+          updateState: false,
+          completed: false
         });
         axios.post("http://localhost:3000/todoList", {
           id: newId,
-          todo: this.todo
+          todo: this.todo,
+          completed: false
         });
         this.todo = "";
       } else {
@@ -114,7 +118,7 @@ export default {
     async updateTodo(id, todo) {
       if (todo.todo) {
         await axios
-          .put(`http://localhost:3000/todoList/${id}`, {
+          .patch(`http://localhost:3000/todoList/${id}`, {
             todo: todo.todo
           })
           .catch(function(error) {
@@ -123,7 +127,7 @@ export default {
         todo.updateState = false;
       } else {
         await axios
-          .put(`http://localhost:3000/todoList/${id}`, {
+          .patch(`http://localhost:3000/todoList/${id}`, {
             todo: this.cachedTodo
           })
           .catch(function(error) {
@@ -134,16 +138,27 @@ export default {
       }
     },
     editTodo(todo) {
-      this.cachedTodo = todo.todo;
-      todo.updateState = true;
+      if (todo.completed === false) {
+        this.cachedTodo = todo.todo;
+        todo.updateState = true;
+      }
     },
     cancelEdit(todo) {
       todo.todo = this.cachedTodo;
       todo.updateState = false;
     },
-    completeStatus(todo) {
+    async completeStatus(id, todo) {
       console.log("called");
+      this.cachedTodo = todo.todo;
       todo.completed = !todo.completed;
+      await axios
+        .patch(`http://localhost:3000/todoList/${id}`, {
+          todo: this.cachedTodo,
+          completed: todo.completed
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     }
   }
 };
@@ -151,95 +166,95 @@ export default {
 
 <style lang="scss">
 .todos-container {
-    min-height: 350px;
-    max-height: 350px;
-    overflow: auto;
+  min-height: 350px;
+  max-height: 350px;
+  overflow: auto;
 }
 .todo-card {
-    display: flex;
-    justify-content: space-between;
-    border-radius: 8px;
-    box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
-    padding: 8px;
-    margin: 10px;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 8px;
+  box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  margin: 10px;
 }
 .placeholder {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 .todo-placeholder {
-    margin-top: 35%;
+  margin-top: 35%;
 }
 .todo-placeholder p {
-    color: rgb(210, 204, 204);
-    font-size: 28px;
+  color: rgb(210, 204, 204);
+  font-size: 28px;
 }
 .todo-input {
-    width: 100%;
-    padding: 8px;
-    outline: 0;
-    margin-right: 5px;
-    font-size: 16px;
-    border: 1px solid #55cf61;
-    border-radius: 8px;
+  width: 100%;
+  padding: 8px;
+  outline: 0;
+  margin-right: 5px;
+  font-size: 16px;
+  border: 1px solid #55cf61;
+  border-radius: 8px;
 }
 .pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 .delete-button {
-    width: 18px;
-    height: 18px;
-    font-size: 12px;
-    font-weight: bolder;
-    color: #d05959;
-    border-radius: 50%;
-    border: 1px solid #d05959;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  font-weight: bolder;
+  color: #d05959;
+  border-radius: 50%;
+  border: 1px solid #d05959;
+  transition: 0.2s;
+  &:hover {
     transition: 0.2s;
-    &:hover {
-        transition: 0.2s;
-        background: #d05959;
-        color: white;
-    }
+    background: #d05959;
+    color: white;
+  }
 }
 .edit-todo {
-    border: none;
-    border-bottom: 1px solid #55cf61;
-    font-size: 16px;
-    outline: 0;
-    height: 18px;
+  border: none;
+  border-bottom: 1px solid #55cf61;
+  font-size: 16px;
+  outline: 0;
+  height: 18px;
 }
 .completed {
-    text-decoration: line-through;
-    color: grey;
+  text-decoration: line-through;
+  color: grey;
 }
 .submit-button {
-    border: 1px solid #55cf61;
-    outline: 0;
-    background: #55cf61;
-    border-radius: 8px;
-    font-weight: bolder;
-    color: white;
+  border: 1px solid #55cf61;
+  outline: 0;
+  background: #55cf61;
+  border-radius: 8px;
+  font-weight: bolder;
+  color: white;
+  transition: 0.3s;
+  &:hover {
     transition: 0.3s;
-    &:hover {
-        transition: 0.3s;
-        background: #429f4b;
-    }
-    &:active {
-        transition: 0.2s;
-        box-shadow: 0.5px 0.9px 5px 0 rgb(140, 219, 103);
-    }
+    background: #429f4b;
+  }
+  &:active {
+    transition: 0.2s;
+    box-shadow: 0.5px 0.9px 5px 0 rgb(140, 219, 103);
+  }
 }
 .input-container {
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 }
 .todos-container {
-    margin: 15px 0 0;
-    border-radius: 8px;
-    box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
-    width: 100%;
+  margin: 15px 0 0;
+  border-radius: 8px;
+  box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
+  width: 100%;
 }
 .inner-container {
-    padding: 10px;
+  padding: 10px;
 }
 </style>
