@@ -7,7 +7,8 @@
   <div class="todos-container">
     <div v-if="todoList.length !== 0" class="inner-container">
       <div class="todo-card" v-for="(todo, index) in todoList" :key="index">
-        <div v-if="!todo.updateState" class="todo-desc pointer" v-on:dblclick="editTodo(todo)">{{ todo.todo }}</div>
+        <div v-if="!todo.updateState" class="todo-desc pointer" :class="{ completed : todo.completed }"
+          v-on:click="completeStatus(todo)" v-on:dblclick="editTodo(todo)">{{ todo.todo }}</div>
         <input v-else-if="!todo.completed" type="text" class="edit-todo" v-focus v-model="todo.todo"
           v-on:keyup.enter="updateTodo(todo.id, todo)" v-on:keyup.esc="cancelEdit(todo)"
           v-on:blur="updateTodo(todo.id, todo)" />
@@ -111,14 +112,26 @@ export default {
       return newId;
     },
     async updateTodo(id, todo) {
-      await axios
-        .put(`http://localhost:3000/todoList/${id}`, {
-          todo: todo.todo
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-      todo.updateState = false;
+      if (todo.todo) {
+        await axios
+          .put(`http://localhost:3000/todoList/${id}`, {
+            todo: todo.todo
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+        todo.updateState = false;
+      } else {
+        await axios
+          .put(`http://localhost:3000/todoList/${id}`, {
+            todo: this.cachedTodo
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+        todo.todo = this.cachedTodo;
+        todo.updateState = false;
+      }
     },
     editTodo(todo) {
       this.cachedTodo = todo.todo;
@@ -127,6 +140,10 @@ export default {
     cancelEdit(todo) {
       todo.todo = this.cachedTodo;
       todo.updateState = false;
+    },
+    completeStatus(todo) {
+      console.log("called");
+      todo.completed = !todo.completed;
     }
   }
 };
@@ -134,91 +151,95 @@ export default {
 
 <style lang="scss">
 .todos-container {
-  min-height: 350px;
-  max-height: 350px;
-  overflow: auto;
+    min-height: 350px;
+    max-height: 350px;
+    overflow: auto;
 }
 .todo-card {
-  display: flex;
-  justify-content: space-between;
-  border-radius: 8px;
-  box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
-  padding: 8px;
-  margin: 10px;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 8px;
+    box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    margin: 10px;
 }
 .placeholder {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 .todo-placeholder {
-  margin-top: 35%;
+    margin-top: 35%;
 }
 .todo-placeholder p {
-  color: rgb(210, 204, 204);
-  font-size: 28px;
+    color: rgb(210, 204, 204);
+    font-size: 28px;
 }
 .todo-input {
-  width: 100%;
-  padding: 8px;
-  outline: 0;
-  margin-right: 5px;
-  font-size: 16px;
-  border: 1px solid #55cf61;
-  border-radius: 8px;
+    width: 100%;
+    padding: 8px;
+    outline: 0;
+    margin-right: 5px;
+    font-size: 16px;
+    border: 1px solid #55cf61;
+    border-radius: 8px;
 }
 .pointer {
-  cursor: pointer;
+    cursor: pointer;
 }
 .delete-button {
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
-  font-weight: bolder;
-  color: #d05959;
-  border-radius: 50%;
-  border: 1px solid #d05959;
-  transition: 0.2s;
-  &:hover {
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    font-weight: bolder;
+    color: #d05959;
+    border-radius: 50%;
+    border: 1px solid #d05959;
     transition: 0.2s;
-    background: #d05959;
-    color: white;
-  }
+    &:hover {
+        transition: 0.2s;
+        background: #d05959;
+        color: white;
+    }
 }
 .edit-todo {
-  border: none;
-  border-bottom: 1px solid #55cf61;
-  font-size: 16px;
-  outline: 0;
-  height: 18px;
+    border: none;
+    border-bottom: 1px solid #55cf61;
+    font-size: 16px;
+    outline: 0;
+    height: 18px;
+}
+.completed {
+    text-decoration: line-through;
+    color: grey;
 }
 .submit-button {
-  border: 1px solid #55cf61;
-  outline: 0;
-  background: #55cf61;
-  border-radius: 8px;
-  font-weight: bolder;
-  color: white;
-  transition: 0.3s;
-  &:hover {
+    border: 1px solid #55cf61;
+    outline: 0;
+    background: #55cf61;
+    border-radius: 8px;
+    font-weight: bolder;
+    color: white;
     transition: 0.3s;
-    background: #429f4b;
-  }
-  &:active {
-    transition: 0.2s;
-    box-shadow: 0.5px 0.9px 5px 0 rgb(140, 219, 103);
-  }
+    &:hover {
+        transition: 0.3s;
+        background: #429f4b;
+    }
+    &:active {
+        transition: 0.2s;
+        box-shadow: 0.5px 0.9px 5px 0 rgb(140, 219, 103);
+    }
 }
 .input-container {
-  display: flex;
-  justify-content: space-around;
+    display: flex;
+    justify-content: space-around;
 }
 .todos-container {
-  margin: 15px 0 0;
-  border-radius: 8px;
-  box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
-  width: 100%;
+    margin: 15px 0 0;
+    border-radius: 8px;
+    box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
+    width: 100%;
 }
 .inner-container {
-  padding: 10px;
+    padding: 10px;
 }
 </style>
