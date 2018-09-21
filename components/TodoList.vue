@@ -167,110 +167,125 @@ export default {
 
 <style lang="scss">
 @keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translate3d(0, -100%, 0);
-  }
+    from {
+        opacity: 0;
+        transform: translate3d(0, -100%, 0);
+    }
 
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
 }
 .fadeInDown {
-  animation: fadeInDown 1s;
-  animation-name: fadeInDown;
+    animation: fadeInDown 1s;
+    animation-name: fadeInDown;
+}
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        transform: translate3d(0, -100%, 0);
+    }
+}
+
+.fadeOutUp {
+    animation: fadeOutUp 1s;
+    animation-name: fadeOutUp;
 }
 .todos-container {
-  min-height: 350px;
-  max-height: 350px;
-  overflow: auto;
+    min-height: 350px;
+    max-height: 350px;
+    overflow: auto;
 }
 .todo-card {
-  display: flex;
-  justify-content: space-between;
-  border-radius: 8px;
-  box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
-  padding: 8px;
-  margin: 10px;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 8px;
+    box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    margin: 10px;
 }
 .placeholder {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 .todo-placeholder {
-  margin-top: 140px;
+    margin-top: 140px;
 }
 .todo-placeholder p {
-  color: rgb(210, 204, 204);
-  font-size: 28px;
+    color: rgb(210, 204, 204);
+    font-size: 28px;
 }
 .todo-input {
-  width: 100%;
-  padding: 8px;
-  outline: 0;
-  margin-right: 5px;
-  font-size: 16px;
-  border: 1px solid #55cf61;
-  border-radius: 8px;
+    width: 100%;
+    padding: 8px;
+    outline: 0;
+    margin-right: 5px;
+    font-size: 16px;
+    border: 1px solid #55cf61;
+    border-radius: 8px;
 }
 .pointer {
-  cursor: pointer;
+    cursor: pointer;
 }
 .delete-button {
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
-  font-weight: bolder;
-  color: #d05959;
-  border-radius: 50%;
-  border: 1px solid #d05959;
-  transition: 0.2s;
-  &:hover {
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    font-weight: bolder;
+    color: #d05959;
+    border-radius: 50%;
+    border: 1px solid #d05959;
     transition: 0.2s;
-    background: #d05959;
-    color: white;
-  }
+    &:hover {
+        transition: 0.2s;
+        background: #d05959;
+        color: white;
+    }
 }
 .edit-todo {
-  border: none;
-  border-bottom: 1px solid #55cf61;
-  font-size: 16px;
-  outline: 0;
-  height: 18px;
+    border: none;
+    border-bottom: 1px solid #55cf61;
+    font-size: 16px;
+    outline: 0;
+    height: 18px;
 }
 .completed {
-  text-decoration: line-through;
-  color: grey;
+    text-decoration: line-through;
+    color: grey;
 }
 .submit-button {
-  border: 1px solid #55cf61;
-  outline: 0;
-  background: #55cf61;
-  border-radius: 8px;
-  font-weight: bolder;
-  color: white;
-  transition: 0.3s;
-  &:hover {
+    border: 1px solid #55cf61;
+    outline: 0;
+    background: #55cf61;
+    border-radius: 8px;
+    font-weight: bolder;
+    color: white;
     transition: 0.3s;
-    background: #429f4b;
-  }
-  &:active {
-    transition: 0.2s;
-    box-shadow: 0.5px 0.9px 5px 0 rgb(140, 219, 103);
-  }
+    &:hover {
+        transition: 0.3s;
+        background: #429f4b;
+    }
+    &:active {
+        transition: 0.2s;
+        box-shadow: 0.5px 0.9px 5px 0 rgb(140, 219, 103);
+    }
 }
 .input-container {
-  display: flex;
-  justify-content: space-around;
+    display: flex;
+    justify-content: space-around;
 }
 .todos-container {
-  margin: 15px 0 0;
-  border-radius: 8px;
-  box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
-  width: 100%;
+    margin: 15px 0 0;
+    border-radius: 8px;
+    box-shadow: 0.5px 0.9px 5px 0 rgba(0, 0, 0, 0.5);
+    width: 100%;
 }
 .inner-container {
-  padding: 10px;
+    padding: 10px;
 }
 </style>
