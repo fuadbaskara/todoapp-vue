@@ -3,7 +3,7 @@
   <div class="main-innerContainer">
     <app-logo/>
     <h1 class="title">
-        todoapp-vue
+        Vue Todo App
     </h1>
     <TodoList/>
   </div>
@@ -25,7 +25,7 @@ export default {
 <style>
 body {
   font-family: "Quicksand", "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+  Arial, sans-serif;
 }
 
 .container {

@@ -1,12 +1,12 @@
 <template>
 <div>
   <div class="input-container">
-    <input type="text" class="todo-input" v-model="todo" v-on:keyup.enter="addTodo" placeholder="What to do..">
+    <input type="text" class="todo-input" v-model="todo" v-on:keyup.enter="addTodo" placeholder="What needs to be done..">
     <button type="button" class="submit-button pointer" v-on:click="addTodo()" name="button">SUBMIT</button>
   </div>
   <div class="todos-container">
     <div v-if="todoList.length !== 0" class="inner-container">
-      <div class="todo-card" v-for="(todo, index) in todoList" :key="index">
+      <div class="todo-card fadeInDown" v-for="(todo, index) in todoList" :key="index">
         <div v-if="!todo.updateState" class="todo-desc pointer" :class="{ completed : todo.completed }"
           v-on:click="completeStatus(todo.id, todo)" v-on:dblclick="editTodo(todo)">{{ todo.todo }}</div>
         <input v-else-if="todo.completed === false" type="text" class="edit-todo" v-focus
@@ -18,12 +18,12 @@
         </div>
       </div>
     </div>
-    <div v-else-if="loading === false && todoList.length === 0" class="placeholder">
+    <div v-else-if="loading === false && !todoList.todo && !todoList.id" class="placeholder">
       <div class="todo-placeholder">
         <p>There's nothing todo yet, Yay!</p>
       </div>
     </div>
-    <div v-else-if="loading === null" class="placeholder">
+    <div v-else-if="loading == true" class="placeholder">
       <div class="todo-placeholder">
         <p>Keep calm and sit tight :)</p>
       </div>
@@ -68,12 +68,14 @@ export default {
             updateState: false
           });
         }
-        this.todoList = data;
+        let timer = setInterval(() => {
+          this.todoList = data;
+          this.loading = false;
+        }, 2000);
       })
       .catch(function(error) {
         console.log(error);
       });
-    this.loading = false;
   },
   methods: {
     deleteTodo(index, id) {
@@ -148,7 +150,6 @@ export default {
       todo.updateState = false;
     },
     async completeStatus(id, todo) {
-      console.log("called");
       this.cachedTodo = todo.todo;
       todo.completed = !todo.completed;
       await axios
@@ -165,6 +166,21 @@ export default {
 </script>
 
 <style lang="scss">
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+.fadeInDown {
+  animation: fadeInDown 1s;
+  animation-name: fadeInDown;
+}
 .todos-container {
   min-height: 350px;
   max-height: 350px;
@@ -183,7 +199,7 @@ export default {
   height: 100%;
 }
 .todo-placeholder {
-  margin-top: 35%;
+  margin-top: 140px;
 }
 .todo-placeholder p {
   color: rgb(210, 204, 204);
